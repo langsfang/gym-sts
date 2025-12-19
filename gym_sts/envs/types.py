@@ -8,10 +8,10 @@ class ResetParams(BaseModel):
     Pydantic model for validating reset() arguments.
     """
 
-    seed: Optional[int]
-    sts_seed: Optional[str]
-    rng_state: Optional[tuple]
-    reboot: bool = False
+    seed: Optional[int] = None
+    sts_seed: Optional[str] = None
+    rng_state: Optional[tuple] = None
+    reboot: Optional[bool] = False
 
     @validator("rng_state")
     def seed_and_rng_state_are_mutually_exclusive(cls, v, values, **kwargs):

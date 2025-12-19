@@ -19,7 +19,7 @@ def main():
         args.lib_dir, args.mods_dir, args.out_dir, headless=args.headless
     )
     observation = env.reset()
-    print(observation.state)
+    # print(observation.state)
 
     while True:
         action = input("Enter an action: ")

@@ -164,7 +164,8 @@ class SlayTheSpireGymEnv(gym.Env):
                 constants.PROJECT_ROOT / "build" / "pipe_locally.sh"
             ).resolve()
             config_file = pathlib.Path(
-                "~/.config/ModTheSpire/CommunicationMod/config.properties"
+                #"~/.config/ModTheSpire/CommunicationMod/config.properties"
+                "~/Library/Preferences/ModTheSpire/CommunicationMod/config.properties"
             ).expanduser()
             command = f"{pipe_script} {self.input_path} {self.output_path}"
 
@@ -182,7 +183,8 @@ class SlayTheSpireGymEnv(gym.Env):
         """
 
         config_file = pathlib.Path(
-            "~/.config/ModTheSpire/SuperFastMode/SuperFastModeConfig.properties"
+            # "~/.config/ModTheSpire/SuperFastMode/SuperFastModeConfig.properties"
+            "~/Library/Preferences/ModTheSpire/SuperFastMode/SuperFastModeConfig.properties"
         ).expanduser()
 
         with config_file.open(mode="w") as f:

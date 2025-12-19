@@ -34,7 +34,7 @@ class PickCard(Action):
 class PlayCard(Action):
     # NOTE: Card position starts with 1
     card_position: int
-    target_index: Optional[int]
+    target_index: Optional[int] = None
 
     def to_command(self):
         target = "" if self.target_index is None else self.target_index
