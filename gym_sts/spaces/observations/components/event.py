@@ -47,6 +47,9 @@ class EventStateObs(ObsComponent):
             }
         )
 
+    def readable(self) -> dict:
+        return { "event" : self.event_id }
+
     def serialize(self) -> dict:
         text = [flag for _, flag in self.text_matches]
         text.extend([False] * (event_consts.MAX_NUM_TEXTS - len(text)))

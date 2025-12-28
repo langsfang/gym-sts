@@ -118,6 +118,26 @@ class PersistentStateObs(PydanticComponent):
 
         return response
 
+    def readable(self) -> dict:
+        floor = self.floor
+        health = f"{self.hp}/{self.max_hp}"
+        gold = self.gold
+        potions = [{"slot": i, "potion": p.name} for i, p in enumerate(self.potions)]
+        relics = [relic.name for relic in self.relics]
+        deck = [card.readable() for card in self.deck]
+        #keys = self.keys.serialize()
+        #map = self.map.serialize()
+        response = {
+            "floor": floor,
+            "health": health,
+            "gold": gold,
+            "potions": potions,
+            "relics": relics,
+            "deck": deck,
+        }
+
+        return response
+
     class SerializedState(BaseModel):
         floor: types.BinaryArray
         health: types.Health.SerializedState

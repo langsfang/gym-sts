@@ -44,7 +44,9 @@ class SlayTheSpireGymEnv(gym.Env):
         reboot_frequency: Optional[int] = None,
         reboot_on_error: bool = False,
         value_fn: Callable[[Observation], float] = full_game_obs_value,
+        character: str = "IRONCLAD",
         ascension: int = 0,
+        sts_seed: str = "0",
         log_states: bool = False,
         logged_state_indent: int | None = None,
         verbose: bool = True,
@@ -118,7 +120,7 @@ class SlayTheSpireGymEnv(gym.Env):
         self.rng_state: Optional[tuple] = None
 
         self.prng: Optional[random.Random] = None
-        self.sts_seed: Optional[str] = None  # The seed used by the game.
+        self.sts_seed: sts_seed
 
         self.action_space = ACTION_SPACE
         self.observation_space = OBSERVATION_SPACE
@@ -127,6 +129,7 @@ class SlayTheSpireGymEnv(gym.Env):
 
         self.value_fn = value_fn
 
+        self.character = character
         self.ascension = ascension
 
         # Create states directory
@@ -384,7 +387,7 @@ class SlayTheSpireGymEnv(gym.Env):
             sts_seed = SeedHelpers.make_seed(self.prng)
         self.sts_seed = sts_seed
 
-        obs = self.communicator.start("DEFECT", self.ascension, self.sts_seed)
+        obs = self.communicator.start(self.character, self.ascension, self.sts_seed)
 
         # In my experience the game isn't actually stable here, and we have
         # to wait for a bit before the game actually starts.

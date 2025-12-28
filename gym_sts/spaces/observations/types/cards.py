@@ -62,6 +62,9 @@ class Card(BaseModel):
     def serialize(self, discrete=False) -> Union[BinaryArray, int]:
         return self._serialize(self.id, self.upgrades, discrete=discrete)
 
+    def readable(self):
+        return { "name": self.name, "cost": self.cost, "upgrade": self.upgrades }
+
     @classmethod
     def deserialize(cls, ser_data: Union[int, BinaryArray]) -> Card:
         if isinstance(ser_data, np.ndarray):
