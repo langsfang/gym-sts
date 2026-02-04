@@ -49,6 +49,14 @@ class CardRewardObs(PydanticComponent):
             "skippable": int(self.skippable),
         }
 
+    def readable(self) -> dict:
+        cards = [card.readable() for card in self.cards]
+
+        return {
+            "cards": cards,
+            "singing_bowl": int(self.singing_bowl),
+        }
+
     class SerializedState(BaseModel):
         cards: list[types.BinaryArray]
         singing_bowl: int
