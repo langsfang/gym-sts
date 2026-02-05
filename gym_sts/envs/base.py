@@ -258,6 +258,29 @@ class SlayTheSpireGymEnv(gym.Env):
 
         return self.communicator._manual_command(action)
 
+    def do_action(self, action: str) -> Observation:
+
+        try:
+            obs = self.communicator._manual_command(action)
+
+            success = False
+            for _ in range(10):
+                if len(obs.valid_actions) == 0:
+                    # this can indicate instability
+                    time.sleep(1)
+                    obs = self.observe()
+                else:
+                    success = True
+                    break
+            if not success:
+                raise exceptions.StSError("No valid actions.")
+
+            return obs
+
+        except Exception as e:
+            logger.error(e)
+            return None
+
     def _end_game(self) -> None:
         obs = self.observe()
 

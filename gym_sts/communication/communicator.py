@@ -25,8 +25,16 @@ class Communicator:
 
     def _manual_command(self, action: str) -> Observation:
         self.receiver.empty_fifo()
-        self.sender._send_message(action)
-        state = self.receiver.receive_game_state()
+        while True:
+            try:
+                self.sender._send_message(action)
+                time.sleep(0.5)
+                state = self.receiver.receive_game_state()
+                break
+            except:
+                print("E: do action state")
+                action = "state"
+
         return Observation(state)
 
     def ready(self) -> None:

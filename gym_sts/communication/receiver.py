@@ -7,7 +7,7 @@ from gym_sts import exceptions
 
 
 class Receiver:
-    def __init__(self, fn, timeout: float = 50):
+    def __init__(self, fn, timeout: float = 5):
         self.fh = open(fn, "r")
 
         # Reading the pipe does not block if there are no contents
@@ -15,7 +15,7 @@ class Receiver:
         fcntl.fcntl(self.fh, fcntl.F_SETFL, flag | os.O_NONBLOCK)
 
         self.timeout = timeout
-        self.sleep_time = 0.05
+        self.sleep_time = 1 
         self.num_steps = int(timeout / self.sleep_time)
 
     def empty_fifo(self) -> None:
@@ -42,7 +42,8 @@ class Receiver:
                         return state
                 except json.decoder.JSONDecodeError:
                     print(
-                        "W: Message not in valid JSON, retrying. Contents: " + message
+                        "W: Message not in valid JSON, retrying. "
+                        #"W: Message not in valid JSON, retrying. Contents: " + message
                     )
 
             time.sleep(self.sleep_time)
