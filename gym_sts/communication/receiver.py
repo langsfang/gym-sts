@@ -15,7 +15,7 @@ class Receiver:
         fcntl.fcntl(self.fh, fcntl.F_SETFL, flag | os.O_NONBLOCK)
 
         self.timeout = timeout
-        self.sleep_time = 1 
+        self.sleep_time = 0.5
         self.num_steps = int(timeout / self.sleep_time)
 
     def empty_fifo(self) -> None:
@@ -33,13 +33,15 @@ class Receiver:
         Continues reading game state until the game is waiting for action from
         the agent
         """
+        message = ""
         for _ in range(self.num_steps):
-            message = self.fh.readline()
+            message += self.fh.readline()
             if len(message) > 0:
                 try:
                     state = json.loads(message)
                     if state["ready_for_command"]:
                         return state
+                    message = ""
                 except json.decoder.JSONDecodeError:
                     print(
                         "W: Message not in valid JSON, retrying. "

@@ -28,7 +28,6 @@ class Communicator:
         while True:
             try:
                 self.sender._send_message(action)
-                time.sleep(0.5)
                 state = self.receiver.receive_game_state()
                 break
             except:
