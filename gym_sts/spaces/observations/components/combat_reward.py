@@ -61,6 +61,9 @@ class CombatRewardObs(ObsComponent):
             serialized[i] = reward.serialize()
         return serialized
 
+    def readable(self) -> list[dict]:
+        return [reward.readable() for i, reward in enumerate(self.rewards)]
+
     SerializedState = list[types.Reward.SerializedState]
 
     @classmethod

@@ -82,6 +82,12 @@ class GoldReward(Reward):
             ),
         }
 
+    def readable(self) -> dict:
+        return {
+            "type": "GOLD",
+            "value": self.value,
+        }
+
     @classmethod
     def deserialize(cls, data: Union[dict, Reward.SerializedState]) -> GoldReward:
         if not isinstance(data, cls.SerializedState):
@@ -104,6 +110,12 @@ class PotionReward(Reward):
             "value": utils.to_binary_array(
                 potion_idx, reward_consts.COMBAT_REWARD_LOG_MAX_ID
             ),
+        }
+
+    def readable(self) -> dict:
+        return {
+            "type": "POTION",
+            "value": self.value.name,
         }
 
     @classmethod
@@ -129,6 +141,12 @@ class RelicReward(Reward):
             ),
         }
 
+    def readable(self) -> dict:
+        return {
+            "type": "RELIC",
+            "value": self.value.name,
+        }
+
     @classmethod
     def deserialize(cls, data: Union[dict, Reward.SerializedState]) -> RelicReward:
         if not isinstance(data, cls.SerializedState):
@@ -145,6 +163,12 @@ class CardReward(Reward):
         return {
             "type": reward_consts.RewardType.CARD,
             "value": utils.to_binary_array(0, reward_consts.COMBAT_REWARD_LOG_MAX_ID),
+        }
+
+    def readable(self) -> dict:
+        return {
+            "type": "CARD",
+            "value": 0,
         }
 
     @classmethod
@@ -165,6 +189,12 @@ class KeyReward(Reward):
             "value": utils.to_binary_array(
                 key_idx, reward_consts.COMBAT_REWARD_LOG_MAX_ID
             ),
+        }
+
+    def readable(self) -> dict:
+        return {
+            "type": "KEY",
+            "value": value,
         }
 
     @classmethod
