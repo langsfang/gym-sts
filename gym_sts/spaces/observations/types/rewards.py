@@ -194,7 +194,7 @@ class KeyReward(Reward):
     def readable(self) -> dict:
         return {
             "type": "KEY",
-            "value": value,
+            "value": self.value,
         }
 
     @classmethod
