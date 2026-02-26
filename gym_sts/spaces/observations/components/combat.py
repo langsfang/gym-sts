@@ -124,6 +124,29 @@ class CombatObs(ObsComponent):
 
         return response
 
+    def readable(self) -> dict:
+        effects = [e.readable() for e in self.effects]
+        enemies = [{"id": i, "enemy": enemy.readable()} for i, enemy in enumerate(self.enemies)]
+
+        hand = [{"id": i+1, "card": card.readable()} for i, card in enumerate(self.hand)]
+        discard = [card.readable() for card in self.discard]
+        draw = [card.readable() for card in self.draw]
+        exhaust = [card.readable() for card in self.exhaust]
+
+        response = {
+            "turn": self.turn,
+            "energy": self.energy,
+            "block": self.block,
+            "effects": effects,
+            "hand": hand,
+            "discard": discard,
+            "draw": draw,
+            "exhaust": exhaust,
+            "enemies": enemies,
+        }
+
+        return response
+
     class SerializedState(BaseModel):
         turn: types.BinaryArray
         hand: list[types.HandCard.SerializedState]

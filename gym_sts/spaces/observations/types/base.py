@@ -63,6 +63,12 @@ class Effect(BaseModel):
             "value": utils.to_binary_array(value, combat_consts.LOG_MAX_EFFECT),
         }
 
+    def readable(self) -> dict:
+        return {
+            "effect": self.id,
+            "value": self.amount
+        }
+
     @staticmethod
     def serialize_all(effects: list[Effect]) -> list[dict]:
         serialized = []
@@ -235,6 +241,18 @@ class Enemy(BaseModel):
             "block": utils.to_binary_array(self.block, combat_consts.LOG_MAX_BLOCK),
             "effects": Effect.serialize_all(self.effects),
             "health": Health(hp=self.current_hp, max_hp=self.max_hp).serialize(),
+        }
+
+        return serialized
+
+    def readable(self) -> dict:
+        return {
+            "name": self.id,
+            "intent": self.intent,
+            "attack": f"{self.damage} x {self.times}",
+            "block": self.block, 
+            "effects": [e.readable() for e in self.effects],
+            "health": f"{self.current_hp}/{self.max_hp}"
         }
 
         return serialized
