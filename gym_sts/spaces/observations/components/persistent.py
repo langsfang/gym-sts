@@ -128,6 +128,7 @@ class PersistentStateObs(PydanticComponent):
         #keys = self.keys.serialize()
         #map = self.map.serialize()
         response = {
+            "act_boss": self.map.boss,
             "floor": floor,
             "health": health,
             "gold": gold,
