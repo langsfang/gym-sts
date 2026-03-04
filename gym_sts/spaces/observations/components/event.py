@@ -48,7 +48,10 @@ class EventStateObs(ObsComponent):
         )
 
     def readable(self) -> dict:
-        return { "event" : self.event_id }
+        return { 
+            "event" : self.event_id,
+            "text" : self.raw_text
+        }
 
     def serialize(self) -> dict:
         text = [flag for _, flag in self.text_matches]
