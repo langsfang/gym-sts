@@ -3,9 +3,11 @@ import datetime
 import logging
 import pathlib
 import random
+import shlex
 import shutil
 import string
 import subprocess
+import sys
 import tempfile
 import time
 from typing import Callable, Optional, Tuple, Union
@@ -16,6 +18,7 @@ from docker.models.containers import Container
 
 from gym_sts import constants, exceptions
 from gym_sts.communication import Communicator
+from gym_sts.communication import SocketCommunicator
 from gym_sts.data.state_logger import StateLogger
 from gym_sts.spaces.actions import ACTION_SPACE, ACTIONS, Action
 from gym_sts.spaces.observations import OBSERVATION_SPACE, Observation
@@ -51,6 +54,7 @@ class SlayTheSpireGymEnv(gym.Env):
         logged_state_indent: int | None = None,
         verbose: bool = True,
         communication_timeout: float = 5,
+        local_transport: str = "socket",
     ):
         """
         Gym env to interact with the Slay the Spire video game.
@@ -109,6 +113,7 @@ class SlayTheSpireGymEnv(gym.Env):
 
         self.verbose = verbose
         self.communication_timeout = communication_timeout
+        self.local_transport = local_transport
 
         # Animation can be toggled at any time using set_animate()
         self.animate = animate
@@ -165,14 +170,24 @@ class SlayTheSpireGymEnv(gym.Env):
                 constants.PROJECT_ROOT / "build" / "communication_mod.config.properties"
             ).resolve()
         else:
-            pipe_script = (
-                constants.PROJECT_ROOT / "build" / "pipe_locally.sh"
-            ).resolve()
             config_file = pathlib.Path(
                 #"~/.config/ModTheSpire/CommunicationMod/config.properties"
                 "~/Library/Preferences/ModTheSpire/CommunicationMod/config.properties"
             ).expanduser()
-            command = f"{pipe_script} {self.input_path} {self.output_path}"
+            if self.local_transport == "socket":
+                bridge_script = (
+                    constants.PROJECT_ROOT / "build" / "stdio_socket_bridge.py"
+                ).resolve()
+                command = (
+                    f"{shlex.quote(sys.executable)} -u "
+                    f"{shlex.quote(str(bridge_script))} "
+                    f"{self.communicator.command_port} {self.communicator.state_port}"
+                )
+            else:
+                pipe_script = (
+                    constants.PROJECT_ROOT / "build" / "pipe_locally.sh"
+                ).resolve()
+                command = f"{pipe_script} {self.input_path} {self.output_path}"
 
         with config_file.open(mode="w") as f:
             f.write(f"command={command}\n")
@@ -443,18 +458,27 @@ class SlayTheSpireGymEnv(gym.Env):
         return obs.serialize(), info
 
     def start(self) -> None:
-        if self.headless:
+        if not self.headless and self.local_transport == "socket":
+            self.communicator = SocketCommunicator(timeout=self.communication_timeout)
+            self._run_locally()
+        elif self.headless:
             self._run_container()
+            logger.debug("Opening pipe files...")
+            self.communicator = Communicator(
+                self.input_path,
+                self.output_path,
+                timeout=self.communication_timeout,
+            )
+            logger.debug("Opened pipe files.")
         else:
             self._run_locally()
-
-        logger.debug("Opening pipe files...")
-        self.communicator = Communicator(
-            self.input_path,
-            self.output_path,
-            timeout=self.communication_timeout,
-        )
-        logger.debug("Opened pipe files.")
+            logger.debug("Opening pipe files...")
+            self.communicator = Communicator(
+                self.input_path,
+                self.output_path,
+                timeout=self.communication_timeout,
+            )
+            logger.debug("Opened pipe files.")
 
         self._ready()
         self.communicator.render(self.animate)
@@ -612,6 +636,9 @@ class SlayTheSpireGymEnv(gym.Env):
         """
 
         self.stop()
+        communicator = getattr(self, "communicator", None)
+        if communicator is not None and hasattr(communicator, "close"):
+            communicator.close()
 
         if self._temp_dir is not None:
             self._temp_dir.cleanup()
