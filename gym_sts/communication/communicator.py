@@ -16,11 +16,11 @@ def init_fifos(filenames):
 
 
 class Communicator:
-    def __init__(self, input_path: Path, output_path: Path):
+    def __init__(self, input_path: Path, output_path: Path, timeout: float = 5):
         self.input_path = input_path
         self.output_path = output_path
         init_fifos([self.input_path, self.output_path])
-        self.receiver = Receiver(self.output_path)
+        self.receiver = Receiver(self.output_path, timeout=timeout)
         self.sender = Sender(self.input_path)
 
     def _manual_command(self, action: str) -> Observation:

@@ -50,6 +50,7 @@ class SlayTheSpireGymEnv(gym.Env):
         log_states: bool = False,
         logged_state_indent: int | None = None,
         verbose: bool = True,
+        communication_timeout: float = 5,
     ):
         """
         Gym env to interact with the Slay the Spire video game.
@@ -107,6 +108,7 @@ class SlayTheSpireGymEnv(gym.Env):
         self.reboot_on_error = reboot_on_error
 
         self.verbose = verbose
+        self.communication_timeout = communication_timeout
 
         # Animation can be toggled at any time using set_animate()
         self.animate = animate
@@ -447,7 +449,11 @@ class SlayTheSpireGymEnv(gym.Env):
             self._run_locally()
 
         logger.debug("Opening pipe files...")
-        self.communicator = Communicator(self.input_path, self.output_path)
+        self.communicator = Communicator(
+            self.input_path,
+            self.output_path,
+            timeout=self.communication_timeout,
+        )
         logger.debug("Opened pipe files.")
 
         self._ready()
